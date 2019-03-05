@@ -19,24 +19,61 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+custom_math::vector_3 acceleration(const custom_math::vector_3 &pos, const custom_math::vector_3 &vel)
+{
+	custom_math::vector_3 grav_dir = sun_pos - pos;
 
+	float distance = grav_dir.length();
+
+	grav_dir.normalize();
+	custom_math::vector_3 accel = grav_dir * (G*sun_mass / pow(distance, 2.0));
+
+	return accel;
+}
+
+
+
+void proceed_Euler(custom_math::vector_3 &pos, custom_math::vector_3 &vel)
+{
+	static const double dt = 10000;
+
+	custom_math::vector_3 accel = acceleration(pos, vel);
+
+	vel += accel * dt;
+	pos += vel * dt;
+}
+
+void proceed_RK4(custom_math::vector_3 &pos, custom_math::vector_3 &vel)
+{
+	static const double dt = 10000;
+	static const double one_sixth = 1.0 / 6.0;
+
+	custom_math::vector_3 k1_velocity = vel;
+	custom_math::vector_3 k1_acceleration = acceleration(pos, k1_velocity);
+	custom_math::vector_3 k2_velocity = vel + k1_acceleration * dt*0.5;
+	custom_math::vector_3 k2_acceleration = acceleration(pos + k1_velocity * dt*0.5, k2_velocity);
+	custom_math::vector_3 k3_velocity = vel + k2_acceleration * dt*0.5;
+	custom_math::vector_3 k3_acceleration = acceleration(pos + k2_velocity * dt*0.5, k3_velocity);
+	custom_math::vector_3 k4_velocity = vel + k3_acceleration * dt;
+	custom_math::vector_3 k4_acceleration = acceleration(pos + k3_velocity * dt, k4_velocity);
+
+	vel += (k1_acceleration + (k2_acceleration + k3_acceleration)*2.0 + k4_acceleration)*one_sixth*dt;
+	pos += (k1_velocity + (k2_velocity + k3_velocity)*2.0 + k4_velocity)*one_sixth*dt;
+}
 
 void idle_func(void)
 {
-    custom_math::vector_3 grav_dir = sun_pos - mercury_pos;
-    
-    float distance = grav_dir.length();
+	double r = mercury_pos.length();
+	double v = mercury_vel.length();
 
-    grav_dir.normalize();
-    custom_math::vector_3 accel = grav_dir*(G*sun_mass/pow(distance, 2.0));
-    
-    float dt = 10000;
+	cout << r << " " << v << endl;
 
-    mercury_vel = mercury_vel + accel*dt;
-    mercury_pos = mercury_pos + mercury_vel*dt;
-    
+	proceed_RK4(mercury_pos, mercury_vel);
     positions.push_back(mercury_pos);
-    
+
+//	proceed_RK4(p2_pos, p2_vel);
+//	positions.push_back(p2_pos);
+
     glutPostRedisplay();
 }
 

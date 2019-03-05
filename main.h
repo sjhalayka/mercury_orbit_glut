@@ -5,7 +5,7 @@
 #include "custom_math.h"
 
 #include <cstdlib>
-#include <GLUT/glut.h>       //GLUT Library
+#include <GL/glut.h>       //GLUT Library
 
 #include <iostream>
 using std::cout;
@@ -47,11 +47,24 @@ void passive_motion_func(int x, int y);
 void render_string(int x, const int y, void *font, const string &text);
 void draw_objects(void);
 
+double c = 299792458;
+
 const float G = 6.673e-11;
 const float sun_mass = 1.989e30;
+
+const double R_S = 2 * G*sun_mass / (c*c);
+
 custom_math::vector_3 sun_pos(0, 0, 0);
-custom_math::vector_3 mercury_pos(0, 69817079000, 0);
-custom_math::vector_3 mercury_vel(-38860, 0, 0);
+custom_math::vector_3 mercury_pos(0, 69817079000.0, 0);
+custom_math::vector_3 mercury_vel(-sqrt(G*sun_mass / mercury_pos.length()), 0, 0);
+
+custom_math::vector_3 p2_pos(0, 70817079000.0, 0);
+custom_math::vector_3 p2_vel(-sqrt(G*sun_mass / p2_pos.length()), 0, 0);
+
+
+
+
+
 
 vector<custom_math::vector_3> positions;
 
