@@ -3,6 +3,8 @@
 
 int main(int argc, char **argv)
 {
+	cout << setprecision(20) << endl;
+
 	glutInit(&argc, argv);
 	init_opengl(win_x, win_y);
 	glutReshapeFunc(reshape_func);
@@ -19,7 +21,7 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-custom_math::vector_3 acceleration(const custom_math::vector_3 &pos, const custom_math::vector_3 &vel)
+custom_math::vector_3 grav_acceleration(const custom_math::vector_3 &pos, const custom_math::vector_3 &vel, const double G)
 {
 	custom_math::vector_3 grav_dir = sun_pos - pos;
 
@@ -33,29 +35,29 @@ custom_math::vector_3 acceleration(const custom_math::vector_3 &pos, const custo
 
 
 
-void proceed_Euler(custom_math::vector_3 &pos, custom_math::vector_3 &vel)
+void proceed_Euler(custom_math::vector_3 &pos, custom_math::vector_3 &vel, const double G)
 {
 	static const double dt = 10000;
 
-	custom_math::vector_3 accel = acceleration(pos, vel);
+	custom_math::vector_3 accel = grav_acceleration(pos, vel, G);
 
 	vel += accel * dt;
 	pos += vel * dt;
 }
 
-void proceed_RK4(custom_math::vector_3 &pos, custom_math::vector_3 &vel)
+void proceed_RK4(custom_math::vector_3 &pos, custom_math::vector_3 &vel, const double G)
 {
 	static const double dt = 10000;
 	static const double one_sixth = 1.0 / 6.0;
 
 	custom_math::vector_3 k1_velocity = vel;
-	custom_math::vector_3 k1_acceleration = acceleration(pos, k1_velocity);
+	custom_math::vector_3 k1_acceleration = grav_acceleration(pos, k1_velocity, G);
 	custom_math::vector_3 k2_velocity = vel + k1_acceleration * dt*0.5;
-	custom_math::vector_3 k2_acceleration = acceleration(pos + k1_velocity * dt*0.5, k2_velocity);
+	custom_math::vector_3 k2_acceleration = grav_acceleration(pos + k1_velocity * dt*0.5, k2_velocity, G);
 	custom_math::vector_3 k3_velocity = vel + k2_acceleration * dt*0.5;
-	custom_math::vector_3 k3_acceleration = acceleration(pos + k2_velocity * dt*0.5, k3_velocity);
+	custom_math::vector_3 k3_acceleration = grav_acceleration(pos + k2_velocity * dt*0.5, k3_velocity, G);
 	custom_math::vector_3 k4_velocity = vel + k3_acceleration * dt;
-	custom_math::vector_3 k4_acceleration = acceleration(pos + k3_velocity * dt, k4_velocity);
+	custom_math::vector_3 k4_acceleration = grav_acceleration(pos + k3_velocity * dt, k4_velocity, G);
 
 	vel += (k1_acceleration + (k2_acceleration + k3_acceleration)*2.0 + k4_acceleration)*one_sixth*dt;
 	pos += (k1_velocity + (k2_velocity + k3_velocity)*2.0 + k4_velocity)*one_sixth*dt;
@@ -63,16 +65,8 @@ void proceed_RK4(custom_math::vector_3 &pos, custom_math::vector_3 &vel)
 
 void idle_func(void)
 {
-	double r = mercury_pos.length();
-	double v = mercury_vel.length();
-
-	cout << r << " " << v << endl;
-
-	proceed_RK4(mercury_pos, mercury_vel);
+	proceed_RK4(mercury_pos, mercury_vel, G);
     positions.push_back(mercury_pos);
-
-//	proceed_RK4(p2_pos, p2_vel);
-//	positions.push_back(p2_pos);
 
     glutPostRedisplay();
 }
