@@ -50,8 +50,8 @@ void passive_motion_func(int x, int y);
 void render_string(int x, const int y, void *font, const string &text);
 void draw_objects(void);
 
-const double c = 299792458;
-const double G = 6.673e-11;
+const double speed_of_light = 299792458;
+const double grav_constant = 6.673e-11;
 const double sun_mass = 1.989e30;
 
 custom_math::vector_3 sun_pos(0, 0, 0);

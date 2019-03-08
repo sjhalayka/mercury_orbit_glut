@@ -35,19 +35,16 @@ custom_math::vector_3 grav_acceleration(const custom_math::vector_3 &pos, const 
 
 
 
-void proceed_Euler(custom_math::vector_3 &pos, custom_math::vector_3 &vel, const double G)
+void proceed_Euler(custom_math::vector_3 &pos, custom_math::vector_3 &vel, const double G, const double dt)
 {
-	static const double dt = 10000;
-
 	custom_math::vector_3 accel = grav_acceleration(pos, vel, G);
 
 	vel += accel * dt;
 	pos += vel * dt;
 }
 
-void proceed_RK4(custom_math::vector_3 &pos, custom_math::vector_3 &vel, const double G)
+void proceed_RK4(custom_math::vector_3 &pos, custom_math::vector_3 &vel, const double G, const double dt)
 {
-	static const double dt = 10000;
 	static const double one_sixth = 1.0 / 6.0;
 
 	custom_math::vector_3 k1_velocity = vel;
@@ -65,7 +62,11 @@ void proceed_RK4(custom_math::vector_3 &pos, custom_math::vector_3 &vel, const d
 
 void idle_func(void)
 {
-	proceed_RK4(mercury_pos, mercury_vel, G);
+	const double dt = 10000;
+
+	// proceed_Euler(mercury_pos, mercury_vel, grav_constant, dt);
+	proceed_RK4(mercury_pos, mercury_vel, grav_constant, dt);
+
     positions.push_back(mercury_pos);
 
     glutPostRedisplay();
