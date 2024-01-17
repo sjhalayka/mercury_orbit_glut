@@ -60,12 +60,52 @@ void proceed_RK4(custom_math::vector_3 &pos, custom_math::vector_3 &vel, const d
 	pos += (k1_velocity + (k2_velocity + k3_velocity)*2.0 + k4_velocity)*one_sixth*dt;
 }
 
+
+void proceed_symplectic4(custom_math::vector_3& pos, custom_math::vector_3& vel, const double G, const double dt)
+{
+	static double const cr2 = pow(2.0, 1.0 / 3.0);
+
+	static const double c[4] =
+	{
+		1.0 / (2.0 * (2.0 - cr2)),
+		(1.0 - cr2) / (2.0 * (2.0 - cr2)),
+		(1.0 - cr2) / (2.0 * (2.0 - cr2)),
+		1.0 / (2.0 * (2.0 - cr2))
+	};
+
+	static const double d[4] =
+	{
+		1.0 / (2.0 - cr2),
+		-cr2 / (2.0 - cr2),
+		1.0 / (2.0 - cr2),
+		0.0
+	};
+
+	pos += vel * c[0] * dt;
+	vel += grav_acceleration(pos, vel, G) * d[0] * dt;
+
+	pos += vel * c[1] * dt;
+	vel += grav_acceleration(pos, vel, G) * d[1] * dt;
+
+	pos += vel * c[2] * dt;
+	vel += grav_acceleration(pos, vel, G) * d[2] * dt;
+
+	pos += vel * c[3] * dt;
+ //	vel += grav_acceleration(pos, vel, G) * d[3] * dt; // last element d[3] is always 0
+}
+
+
+
+
 void idle_func(void)
 {
-	const double dt = 10000;
+	const double dt = 10000; // 10000 seconds == 2.77777 hours
 
-	// proceed_Euler(mercury_pos, mercury_vel, grav_constant, dt);
-	proceed_RK4(mercury_pos, mercury_vel, grav_constant, dt);
+	// Pick an integrator:
+
+	//proceed_Euler(mercury_pos, mercury_vel, grav_constant, dt);
+	//proceed_RK4(mercury_pos, mercury_vel, grav_constant, dt);
+	proceed_symplectic4(mercury_pos, mercury_vel, grav_constant, dt);
 
     positions.push_back(mercury_pos);
 
