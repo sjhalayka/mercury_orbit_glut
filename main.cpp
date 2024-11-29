@@ -25,7 +25,7 @@ custom_math::vector_3 grav_acceleration(const custom_math::vector_3 &pos, const 
 {
 	custom_math::vector_3 grav_dir = sun_pos - pos;
 
-	float distance = grav_dir.length();
+	double distance = grav_dir.length();
 
 	grav_dir.normalize();
 	custom_math::vector_3 accel = grav_dir * (G*sun_mass / pow(distance, 2.0));
@@ -135,7 +135,7 @@ void init_opengl(const int &width, const int &height)
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	glClearColor(background_colour.x, background_colour.y, background_colour.z, 1);
+	glClearColor((float)background_colour.x, (float)background_colour.y, (float)background_colour.z, 1);
 	glClearDepth(1.0f);
 
 	main_camera.Set(0, 0, camera_w, camera_fov, win_x, win_y, camera_near, camera_far);
@@ -178,17 +178,17 @@ void draw_objects(void)
 	glPushMatrix();
   
 
-    glPointSize(1.0);
+    glPointSize(2.0);
     glLineWidth(1.0f);
 
     
     glBegin(GL_POINTS);
-    glVertex3f(sun_pos.x, sun_pos.y, sun_pos.z);
+    glVertex3d(sun_pos.x, sun_pos.y, sun_pos.z);
     
     glColor3f(1.0, 1.0, 1.0);
     
     for(size_t i = 0; i < positions.size(); i++)
-    glVertex3f(positions[i].x, positions[i].y, positions[i].z);
+    glVertex3d(positions[i].x, positions[i].y, positions[i].z);
     
     glEnd();
     
@@ -246,29 +246,29 @@ void display_func(void)
 		glPushMatrix();
 		glLoadIdentity();
 		gluOrtho2D(0, win_x, 0, win_y);
-		glScalef(1, -1, 1); // Neat. :)
-		glTranslatef(0, -win_y, 0); // Neat. :)
+		glScaled(1, -1, 1); // Neat. :)
+		glTranslated(0, -win_y, 0); // Neat. :)
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
 
-		glColor3f(control_list_colour.x, control_list_colour.y, control_list_colour.z);
+		glColor3d(control_list_colour.x, control_list_colour.y, control_list_colour.z);
 
 		size_t break_size = 22;
 		size_t start = 20;
 		ostringstream oss;
 
-		render_string(10, start, GLUT_BITMAP_HELVETICA_18, string("Mouse controls:"));
-		render_string(10, start + 1*break_size, GLUT_BITMAP_HELVETICA_18, string("  LMB + drag: Rotate camera"));
-		render_string(10, start + 2*break_size, GLUT_BITMAP_HELVETICA_18, string("  RMB + drag: Zoom camera"));
+		render_string(10, static_cast<int>(start), GLUT_BITMAP_HELVETICA_18, string("Mouse controls:"));
+		render_string(10, static_cast<int>(start + 1*break_size), GLUT_BITMAP_HELVETICA_18, string("  LMB + drag: Rotate camera"));
+		render_string(10, static_cast<int>(start + 2*break_size), GLUT_BITMAP_HELVETICA_18, string("  RMB + drag: Zoom camera"));
 
-		render_string(10, start + 4*break_size, GLUT_BITMAP_HELVETICA_18, string("Keyboard controls:"));
-        render_string(10, start + 5*break_size, GLUT_BITMAP_HELVETICA_18, string("  w: Draw axis"));
-		render_string(10, start + 6*break_size, GLUT_BITMAP_HELVETICA_18, string("  e: Draw text"));
-		render_string(10, start + 7*break_size, GLUT_BITMAP_HELVETICA_18, string("  u: Rotate camera +u"));
-		render_string(10, start + 8*break_size, GLUT_BITMAP_HELVETICA_18, string("  i: Rotate camera -u"));
-		render_string(10, start + 9*break_size, GLUT_BITMAP_HELVETICA_18, string("  o: Rotate camera +v"));
-		render_string(10, start + 10*break_size, GLUT_BITMAP_HELVETICA_18, string("  p: Rotate camera -v"));
+		render_string(10, static_cast<int>(start + 4*break_size), GLUT_BITMAP_HELVETICA_18, string("Keyboard controls:"));
+        render_string(10, static_cast<int>(start + 5*break_size), GLUT_BITMAP_HELVETICA_18, string("  w: Draw axis"));
+		render_string(10, static_cast<int>(start + 6*break_size), GLUT_BITMAP_HELVETICA_18, string("  e: Draw text"));
+		render_string(10, static_cast<int>(start + 7*break_size), GLUT_BITMAP_HELVETICA_18, string("  u: Rotate camera +u"));
+		render_string(10, static_cast<int>(start + 8*break_size), GLUT_BITMAP_HELVETICA_18, string("  i: Rotate camera -u"));
+		render_string(10, static_cast<int>(start + 9*break_size), GLUT_BITMAP_HELVETICA_18, string("  o: Rotate camera +v"));
+		render_string(10, static_cast<int>(start + 10*break_size), GLUT_BITMAP_HELVETICA_18, string("  p: Rotate camera -v"));
 
 
 		
@@ -279,12 +279,12 @@ void display_func(void)
 		oss.clear();
 		oss.str("");		
 		oss << "Camera position: " << eye.x << ' ' << eye.y << ' ' << eye.z;
-		render_string(10, win_y - 2*break_size, GLUT_BITMAP_HELVETICA_18, oss.str());
+		render_string(10, static_cast<int>(win_y - 2*break_size), GLUT_BITMAP_HELVETICA_18, oss.str());
 
 		oss.clear();
 		oss.str("");
 		oss << "Camera position (normalized): " << eye_norm.x << ' ' << eye_norm.y << ' ' << eye_norm.z;
-		render_string(10, win_y - break_size, GLUT_BITMAP_HELVETICA_18, oss.str());
+		render_string(10, static_cast<int>(win_y - break_size), GLUT_BITMAP_HELVETICA_18, oss.str());
 
 		glPopMatrix();
 		glMatrixMode(GL_PROJECTION);

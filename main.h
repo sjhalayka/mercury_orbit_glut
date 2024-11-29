@@ -73,14 +73,14 @@ uv_camera main_camera;
 
 GLint win_id = 0;
 GLint win_x = 800, win_y = 600;
-float camera_w = 2e11;
+float camera_w = 2e11f;
 
 float camera_fov = 45;
 float camera_x_transform = 0;
 float camera_y_transform = 0;
-float u_spacer = 0.01;
-float v_spacer = 0.5*u_spacer;
-float w_spacer = 0.1;
+float u_spacer = 0.01f;
+float v_spacer = 0.5f*u_spacer;
+float w_spacer = 0.1f;
 float camera_near = 1;
 float camera_far = 1000000000;
 
